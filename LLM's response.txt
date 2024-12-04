@@ -1,0 +1,179 @@
+________________________________TEST - CHATBOT________________________________
+
+<Maxy-Mind> :
+
+Hi Faizal Khan! How can I help you today?
+
+<User> :
+
+hi 
+
+<Maxy-Mind> :
+
+Hello again! I'm here to assist you with any queries or payments related to your account. What would you like to know or do?        
+
+<User> :
+
+i would like to view my debbt 
+
+<Maxy-Mind> :
+
+Here's the information you requested:
+
+- Name: Faizal Khan
+- Phone: (XXX) XXX-2325
+- Outstanding Amount: $10,000.00
+- Date of Debt: 2024-08-12
+
+Do you want to know more about your individual debts or any other account details?
+
+<User> :
+
+yes
+
+<Maxy-Mind> :
+
+Your individual debts are as follows:
+
+- X1: $1,000.00
+- X2: $2,000.00
+- X3: $3,000.00
+- X4: $4,000.00
+
+Would you like to make a payment towards these debts or discuss a payment plan?
+
+<User> :
+
+i dont have a job and no money
+
+<Maxy-Mind> :
+
+I understand that it can be challenging to manage finances without a steady income. Let's explore some options to help you address this situation.
+
+Would you consider a payment plan with smaller, more manageable instalments? We can discuss a suitable frequency and duration to ensure it fits your circumstances.
+
+<User> :
+
+yes
+
+<Maxy-Mind> :
+
+Great! Let's start with a weekly plan. Would it be alright for you to make weekly ACH payments of $192.31 for 52 weeks, starting on 2024-12-24?
+
+<User> :
+
+can you make it 50 weekly 
+
+<Maxy-Mind> :
+
+I'm sorry, but the payment plan needs to be completed within a year from the date of debt, which is 2024-08-12 in your case. As such, the maximum period for weekly payments is 52 weeks.
+
+Would you like to proceed with the suggested plan or discuss a different frequency, like fortnightly or monthly payments?
+
+<User> :
+
+yes
+
+<Maxy-Mind> :
+
+Would it be alright for you to make weekly ACH payments of $192.31 for 52 weeks, starting on 2024-12-24?
+
+Amount: 192.31
+Frequency: WEEKS
+Period: 52 WEEKS
+Start Date: 2024-12-24
+Payment Method: ACH
+
+<User> :
+
+yes
+
+<Maxy-Mind> :
+
+Thank you for confirming the payment plan. Your payment link will be generated shortly.
+
+If you have any further questions or need assistance, feel free to ask. You can also view Maxyfi's website or the U.S. Income Tax website for more information.
+
+<User> :
+
+q
+
+<System>
+
+Stored Request: {
+    "amount": "192.31",
+    "frequency": "WEEK",
+    "period": "52 WEEKS",
+    "start_date": "2024-12-24",
+    "payment_method": "ACH"
+}
+
+__________________________________________________________________________________________
+
+<Maxy-Mind> :
+
+Hi Faizal Khan! How can I help you today?
+
+<User> :
+
+got a call      
+
+<Maxy-Mind> :
+
+I understand. You can view your account details here:
+
+- Name: Faizal Khan
+- Phone: (XXX) XXX-2325
+- Outstanding Amount: $10,000.00
+- Date of Debt: 2024-08-12
+
+Would you like to know more about your debts or make a payment plan?
+
+<User> :
+
+i would like to make payment in full
+
+<Maxy-Mind> :
+
+Great! I can help you with that.
+
+Would it be alright for you to make a full payment of $10,000.00 on 2024-12-17?
+
+<User> :
+
+yes
+
+<Maxy-Mind> :
+
+Amount: $10,000.00
+Frequency: SINGLE
+Due Date: 2024-12-17
+Payment Method: ACH
+
+Your payment link is generated and will be given shortly.
+
+Do you have any other questions or would you like to learn more about our services?
+
+<User> :
+
+no
+
+<Maxy-Mind> :
+
+Okay, I hope you have a great day!
+
+If you need any further assistance, feel free to ask.
+
+<User> :
+
+q
+
+<System>
+
+Stored Request: {
+    "amount": "10000.00",
+    "frequency": "SINGLE",
+    "period": null,
+    "start_date": "2024-12-17",
+    "payment_method": "ACH"
+}
