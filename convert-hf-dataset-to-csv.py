@@ -7,15 +7,12 @@ dataset = load_dataset("not-faizal/preference-dataset-prep", split="train")
 # Step 2: Convert to pandas DataFrame
 df = dataset.to_pandas()
 
-# Step 3: Display the first few rows
-print(df.head())
+# Step 3: Filter the DataFrame
+filtered_df = df[(df['helpfulness'] >= 3.0) | (df['correctness'] >= 3.0)]
 
-# Step 4: Save as .parquet file locally
-df.to_parquet("local_file.parquet")
+# Step 4: Save as CSV and JSONL
+filtered_df.to_csv("converted_filtered_data.csv", index=False)
+filtered_df.to_json("converted_filtered_data.jsonl", orient="records", lines=True)
 
-# Step 5: Read the .parquet file (for validation)
-df_from_parquet = pd.read_parquet("local_file.parquet")
-print(df_from_parquet.head())
-
-# Step 6: Convert to CSV (Optional)
-df_from_parquet.to_csv("local_file.csv", index=False)
+# Step 5: Display the first few rows (Optional)
+print(filtered_df.head())
