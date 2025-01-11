@@ -1,7 +1,7 @@
 import cohere
 import re
 import json
-import requests  # Added for API call
+import requests
 
 co = cohere.ClientV2("auaYNw33GagLljWAKVy4ttxwvjHS6sPOfvKEi03E")
 
