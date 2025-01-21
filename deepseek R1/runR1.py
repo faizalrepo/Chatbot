@@ -10,6 +10,8 @@ from colorama import Fore, Style, init
 init(autoreset=True)
 
 user = input("\n\nAsk R1:\n\n")
+# user = "calculate area of rectangle of length 10cm and breadth 12cm"
+
 print("\n\nR1: *thinking*")
 
 res = ollama.generate(
@@ -45,21 +47,49 @@ if match := pattern.match(text):
     # Formatting boxed answers \boxed{...}
     inner_text = re.sub(r'\\boxed{(.*?)}', rf'[{Style.BRIGHT}\1{Style.RESET_ALL}]', inner_text)
     
-    # Modify outer_text to:
-    outer_text = re.sub(r'\*\*(.*?)\*\*', r'\1', outer_text)  # Remove bold (**) formatting
-    outer_text = re.sub(r'\\\[(.*?)\\\]', r'\n\n\1\n\n', outer_text)  # Convert math blocks to  new lines
-    
-    # Apply other cleaning steps as needed
-    outer_text = re.sub(r'\\text{(.*?)}', r'\1', outer_text)  # Remove \text{} commands
-    outer_text = re.sub(r'\s*\\,\s*', ' ', outer_text)  # Clean up LaTeX spacing
-    outer_text = re.sub(r'\\\((.*?)\\\)', r'\1', outer_text)  # Remove inline math
-    outer_text = re.sub(r'\\times', 'x', outer_text)  # Replace multiplication
-    outer_text = re.sub(r'\^2', '²', outer_text)  # Format squared
-    outer_text = re.sub(r'\\boxed{(.*?)}', r'[\1]', outer_text)  # Format boxes
-    outer_text = re.sub(r'\s+', ' ', outer_text)  # Normalize spaces
-    outer_text = re.sub(r'\n\s*\n', '\n\n', outer_text)  # Clean line breaks
-    outer_text = outer_text.strip()
-    
+ # Format equations with indentation
+    # outer_text = re.sub(r'\\text{(.*?)}', r'\1', outer_text)  # Remove \text{} commands
+    # outer_text = re.sub(r'\\\[(.*?)\\\]', r'\n\n\1\n\n', outer_text)  # Replace block math  with newlines
+    # outer_text = re.sub(r'\\\((.*?)\\\)', r'\1', outer_text)  # Inline math stays on the same   line
+    # outer_text = re.sub(r'(\*\*.*?\*\*|\\times|\\,|\^2|\\text{.*?})', r'', outer_text)  #   Remove other LaTeX formatting
+    # outer_text = outer_text.replace(r'\[', '').replace(r'\]', '')
+    outer_text = outer_text.replace(r'\[', '').replace(r'\]', '')  # Remove block math
+    outer_text = outer_text.replace(r'\(', '').replace(r'\)', '')  # Remove inline math
+    outer_text = outer_text.replace(r'\text{', '').replace('}', '')  # Remove \text{}   formatting
+    outer_text = outer_text.replace(r'\,', '')  # Remove LaTeX spacing
+    outer_text = outer_text.replace(r'\times', 'x')  # Replace multiplication
+    outer_text = outer_text.replace(r'^2', '²')  # Format squared
+    outer_text = outer_text.replace(r'**', '')  # Format squared
+    outer_text = outer_text.replace(r'\mathrm{\;', '').replace(r'}', '')  # Remove LaTeX    formatting in boxed text
+    outer_text = outer_text.replace(r'\boxed{', '').replace('}', '')  # Format boxed content
+    outer_text = outer_text.replace(r'\\', '')  # Format squared
+    outer_text = outer_text.replace(r'\\rm{', '')  # Format squared
+    # outer_text = re.sub(r'\\\[(.*?)\\\]', r'\n    \1\n', outer_text)  # Math blocks with 4-space indent
+    # outer_text = re.sub(r'\s*\\,\s*', ' ', outer_text)  # Clean up spacing
+    # outer_text = re.sub(r'\\\((.*?)\\\)', r'\1', outer_text)  # Remove inline math
+    # outer_text = re.sub(r'\\times', 'x', outer_text)  # Replace multiplication
+    # outer_text = re.sub(r'\^2', '²', outer_text)  # Format squared
+    # outer_text = re.sub(r'\\boxed{(.*?)}', r'[\1]', outer_text)  # Format boxes
+    # outer_text = re.sub(r'\s+', ' ', outer_text)  # Normalize spaces
+    # outer_text = re.sub(r'\n\s*\n', '\n\n', outer_text)  # Clean line breaks
+    # outer_text = outer_text.strip()
+    # lines = [line.strip() for line in outer_text.splitlines() if line.strip()]
+    # outer_text = '\n\n'.join(lines)
+
+    def reduce_newlines(text):
+        lines = text.splitlines()
+        cleaned_lines = []
+
+        for line in lines:
+            if line.strip():  # Only add non-empty lines
+                cleaned_lines.append(line.strip())
+            elif cleaned_lines and cleaned_lines[-1] != "":  # Ensure single spacing
+                cleaned_lines.append("")
+
+        return "\n".join(cleaned_lines)
+
+    outer_text = reduce_newlines(outer_text)
+
     separator = f"{INNER_TEXT_COLOR}{'-' * 80}{Style.RESET_ALL}"
     colored_output = (
         f"\n{separator}\n"
@@ -67,7 +97,7 @@ if match := pattern.match(text):
         f"\n{separator}\n\n"
         f"{OUTER_TEXT_COLOR}{outer_text}{Style.RESET_ALL}\n"
     )
-    
+
     print(colored_output)
 
 
