@@ -1,92 +1,80 @@
-# import os
-# from dotenv import load_dotenv
 import ollama
-# from langchain_community.llms import Ollama
-# from langchain_ollama import OllamaLLM
 import re
 from colorama import Fore, Style, init
+import time
+import sys
+from datetime import datetime
 
-# load_dotenv()
 init(autoreset=True)
 
-user = input("\n\nAsk R1:\n\n")
-# user = "calculate area of rectangle of length 10cm and breadth 12cm"
+user = input(f"\n\n{Style.BRIGHT + Fore.WHITE}Ask R1:\n\n{Style.RESET_ALL}")
 
-print("\n\nR1: *thinking*")
+# print("\n\n<<<<  R1 is thinking...  >>>>\n", end='', flush=True)
+start_time = time.time()
+
+def show_timer():
+    print("\n")
+    while True:
+        elapsed = time.time() - start_time
+        mins = int(elapsed // 60)
+        secs = int(elapsed % 60)
+        timer_text = f"{mins} min {secs} sec" if mins > 0 else f"{secs} sec"
+        print(f"\r<<<<  R1 is thinking... | {timer_text}  >>>>", end='', flush=True)
+        time.sleep(1)
+
+
+from threading import Thread
+timer_thread = Thread(target=show_timer)
+timer_thread.daemon = True
+timer_thread.start()
 
 res = ollama.generate(
     model="deepseek-r1:1.5b",
-    # model="qwen2.5:3b",
     prompt = user,
-    # system="only funny responses",
-    # options={'num_predict': 50}
 )
-# print("\n",res['response'],"\n")
 
 text = res['response']
 
-INNER_TEXT_COLOR = Style.DIM + Fore.WHITE  # Grey (dim white)
-OUTER_TEXT_COLOR = Style.BRIGHT + Fore.WHITE  # Bright white
+INNER_TEXT_COLOR = Style.DIM + Fore.WHITE  
+OUTER_TEXT_COLOR = Style.BRIGHT + Fore.WHITE  
 
-# Regex to match tags and their contents
-pattern = re.compile(r'(<think>)(.*?)(</think>)(.*)', re.DOTALL)
+pattern = re.compile(r'<think>(.*?)</think>\s*(.*)', re.DOTALL)
 
-match = pattern.match(text)
+def reduce_newlines(text):
+    lines = text.splitlines()
+    cleaned_lines = []
+    
+    for line in lines:
+        if line.strip():
+            cleaned_lines.append(line.strip())
+        elif cleaned_lines and cleaned_lines[-1] != "":
+            cleaned_lines.append("")
+            
+    return "\n".join(cleaned_lines)
+
 if match := pattern.match(text):
-    tag_open, inner_text, tag_close, outer_text = match.groups()
+    inner_text = match.group(1)
+    outer_text = match.group(2)
 
-    # Formatting for headings (### Step 1: Some title)
-    inner_text = re.sub(r'### (.*?)\n', rf'\n{Style.BRIGHT}\1{Style.RESET_ALL}\n', inner_text)
-    
-    # Formatting inline math expressions \( ... \)
-    inner_text = re.sub(r'\\\((.*?)\\\)', rf'{Style.BRIGHT}\1{Style.RESET_ALL}', inner_text)
-    
-    # Formatting block math expressions \[ ... \]
-    inner_text = re.sub(r'\\\[(.*?)\\\]', rf'\n{Style.BRIGHT}\1{Style.RESET_ALL}\n', inner_text)
-    
-    # Formatting boxed answers \boxed{...}
-    inner_text = re.sub(r'\\boxed{(.*?)}', rf'[{Style.BRIGHT}\1{Style.RESET_ALL}]', inner_text)
-    
- # Format equations with indentation
-    # outer_text = re.sub(r'\\text{(.*?)}', r'\1', outer_text)  # Remove \text{} commands
-    # outer_text = re.sub(r'\\\[(.*?)\\\]', r'\n\n\1\n\n', outer_text)  # Replace block math  with newlines
-    # outer_text = re.sub(r'\\\((.*?)\\\)', r'\1', outer_text)  # Inline math stays on the same   line
-    # outer_text = re.sub(r'(\*\*.*?\*\*|\\times|\\,|\^2|\\text{.*?})', r'', outer_text)  #   Remove other LaTeX formatting
-    # outer_text = outer_text.replace(r'\[', '').replace(r'\]', '')
-    outer_text = outer_text.replace(r'\[', '').replace(r'\]', '')  # Remove block math
-    outer_text = outer_text.replace(r'\(', '').replace(r'\)', '')  # Remove inline math
-    outer_text = outer_text.replace(r'\text{', '').replace('}', '')  # Remove \text{}   formatting
-    outer_text = outer_text.replace(r'\,', '')  # Remove LaTeX spacing
-    outer_text = outer_text.replace(r'\times', 'x')  # Replace multiplication
-    outer_text = outer_text.replace(r'^2', '²')  # Format squared
-    outer_text = outer_text.replace(r'**', '')  # Format squared
-    outer_text = outer_text.replace(r'\mathrm{\;', '').replace(r'}', '')  # Remove LaTeX    formatting in boxed text
-    outer_text = outer_text.replace(r'\boxed{', '').replace('}', '')  # Format boxed content
-    outer_text = outer_text.replace(r'\\', '')  # Format squared
-    outer_text = outer_text.replace(r'\\rm{', '')  # Format squared
-    # outer_text = re.sub(r'\\\[(.*?)\\\]', r'\n    \1\n', outer_text)  # Math blocks with 4-space indent
-    # outer_text = re.sub(r'\s*\\,\s*', ' ', outer_text)  # Clean up spacing
-    # outer_text = re.sub(r'\\\((.*?)\\\)', r'\1', outer_text)  # Remove inline math
-    # outer_text = re.sub(r'\\times', 'x', outer_text)  # Replace multiplication
-    # outer_text = re.sub(r'\^2', '²', outer_text)  # Format squared
-    # outer_text = re.sub(r'\\boxed{(.*?)}', r'[\1]', outer_text)  # Format boxes
-    # outer_text = re.sub(r'\s+', ' ', outer_text)  # Normalize spaces
-    # outer_text = re.sub(r'\n\s*\n', '\n\n', outer_text)  # Clean line breaks
-    # outer_text = outer_text.strip()
-    # lines = [line.strip() for line in outer_text.splitlines() if line.strip()]
-    # outer_text = '\n\n'.join(lines)
+    inner_text = re.sub(r'### (.*?)\n', r'\n\1\n', inner_text)
+    inner_text = re.sub(r'\\\((.*?)\\\)', r'\1', inner_text)
+    inner_text = re.sub(r'\\\[(.*?)\\\]', r'\n\1\n', inner_text)
+    inner_text = re.sub(r'\\boxed{(.*?)}', r'[\1]', inner_text)
 
-    def reduce_newlines(text):
-        lines = text.splitlines()
-        cleaned_lines = []
-
-        for line in lines:
-            if line.strip():  # Only add non-empty lines
-                cleaned_lines.append(line.strip())
-            elif cleaned_lines and cleaned_lines[-1] != "":  # Ensure single spacing
-                cleaned_lines.append("")
-
-        return "\n".join(cleaned_lines)
+    
+    outer_text = outer_text.replace(r'\[', '').replace(r'\]', '')
+    outer_text = outer_text.replace(r'###', '>>')
+    # outer_text = outer_text.replace(r'- ', '    ')
+    outer_text = outer_text.replace(r'\(', '').replace(r'\)', '')
+    outer_text = outer_text.replace(r'\text{', '').replace('}', '')
+    outer_text = outer_text.replace(r'\,', '')
+    outer_text = outer_text.replace(r'\times', 'x')
+    outer_text = outer_text.replace(r'^2', '²')
+    outer_text = outer_text.replace(r'**', '')
+    outer_text = outer_text.replace(r'\mathrm{\;', '').replace(r'}', '')
+    outer_text = outer_text.replace(r'\boxed{', '').replace('}', '')
+    outer_text = outer_text.replace(r'\\', '')
+    outer_text = outer_text.replace(r'\\rm{', '')
 
     outer_text = reduce_newlines(outer_text)
 
@@ -97,18 +85,16 @@ if match := pattern.match(text):
         f"\n{separator}\n\n"
         f"{OUTER_TEXT_COLOR}{outer_text}{Style.RESET_ALL}\n"
     )
-
+    
+    print("\n")
     print(colored_output)
 
+# Calculate and display total time at the end
+total_time = time.time() - start_time
+total_mins = int(total_time // 60)
+total_secs = int(total_time % 60)
 
-# model = OllamaLLM(
-#     model=os.getenv('OLLAMA_MODEL_1', ''),
-#     # metadata={"num_predict": 50},
-#     num_predict=50,
-#     # num_ctx=50 
-# )
-
-# prompt_input = "Why did the tomato cry?"
-# response = model.invoke(prompt_input)
-
-# print("\n",response,"\n")
+if total_mins > 0:
+    print(f"<<<<  Thought for {total_mins} min {total_secs} sec  >>>>\n")
+else:
+    print(f"<<<<  Thought for {total_secs} seconds  >>>>\n")
